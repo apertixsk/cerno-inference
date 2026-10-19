@@ -1,0 +1,6 @@
+vllm==0.31.0
+transformers>=4.57,<5
+huggingface_hub>=0.34
+datasets>=3.0
+pyyaml>=6
+decision-index @ git+https://github.com/apolinario/decision-index@9eb2dbe2a358004c8782c66e40a83ac07b953fec

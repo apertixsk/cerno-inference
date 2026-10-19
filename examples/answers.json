@@ -1,0 +1,194 @@
+{
+ "apertixai/cerno-27b": {
+  "support_triage": {
+   "kind": {
+    "type": "choice",
+    "choice": "other",
+    "probabilities": {
+     "incident": 0.0104,
+     "billing": 0.0207,
+     "account": 0.0172,
+     "feedback": 0.0118,
+     "spam": 0.0028,
+     "other": 0.9371
+    }
+   },
+   "urgency": {
+    "type": "score",
+    "score": 1.37,
+    "probabilities": {
+     "0": 0.0555,
+     "1": 0.561,
+     "2": 0.3402,
+     "3": 0.0433
+    }
+   },
+   "tone": {
+    "type": "score",
+    "score": 2.08,
+    "probabilities": {
+     "0": 0.0014,
+     "1": 0.005,
+     "2": 0.904,
+     "3": 0.0895
+    }
+   },
+   "needs_human": {
+    "type": "noul",
+    "noul": 0.7311
+   }
+  },
+  "agent_guardrail": {
+   "destructive": {
+    "type": "noul",
+    "noul": 0.9883
+   },
+   "matches_request": {
+    "type": "noul",
+    "noul": 0.8991
+   },
+   "external_effect": {
+    "type": "noul",
+    "noul": 0.001
+   },
+   "risk": {
+    "type": "score",
+    "score": 1.24,
+    "probabilities": {
+     "0": 0.0189,
+     "1": 0.7565,
+     "2": 0.1913,
+     "3": 0.0332
+    }
+   }
+  }
+ },
+ "apertixai/cerno-9b": {
+  "support_triage": {
+   "kind": {
+    "type": "choice",
+    "choice": "other",
+    "probabilities": {
+     "incident": 0.0201,
+     "billing": 0.0109,
+     "account": 0.0327,
+     "feedback": 0.0114,
+     "spam": 0.0121,
+     "other": 0.9129
+    }
+   },
+   "urgency": {
+    "type": "score",
+    "score": 1.29,
+    "probabilities": {
+     "0": 0.1113,
+     "1": 0.5423,
+     "2": 0.2949,
+     "3": 0.0514
+    }
+   },
+   "tone": {
+    "type": "score",
+    "score": 2.07,
+    "probabilities": {
+     "0": 0.004,
+     "1": 0.0109,
+     "2": 0.8932,
+     "3": 0.0919
+    }
+   },
+   "needs_human": {
+    "type": "noul",
+    "noul": 0.5706
+   }
+  },
+  "agent_guardrail": {
+   "destructive": {
+    "type": "noul",
+    "noul": 0.9867
+   },
+   "matches_request": {
+    "type": "noul",
+    "noul": 0.9359
+   },
+   "external_effect": {
+    "type": "noul",
+    "noul": 0.0156
+   },
+   "risk": {
+    "type": "score",
+    "score": 1.28,
+    "probabilities": {
+     "0": 0.0343,
+     "1": 0.6918,
+     "2": 0.2311,
+     "3": 0.0428
+    }
+   }
+  }
+ },
+ "apertixai/cerno-4b": {
+  "support_triage": {
+   "kind": {
+    "type": "choice",
+    "choice": "other",
+    "probabilities": {
+     "incident": 0.0156,
+     "billing": 0.03,
+     "account": 0.1059,
+     "feedback": 0.053,
+     "spam": 0.0156,
+     "other": 0.7799
+    }
+   },
+   "urgency": {
+    "type": "score",
+    "score": 0.6,
+    "probabilities": {
+     "0": 0.5812,
+     "1": 0.247,
+     "2": 0.1578,
+     "3": 0.014
+    }
+   },
+   "tone": {
+    "type": "score",
+    "score": 2.05,
+    "probabilities": {
+     "0": 0.0041,
+     "1": 0.0092,
+     "2": 0.9239,
+     "3": 0.0628
+    }
+   },
+   "needs_human": {
+    "type": "noul",
+    "noul": 0.5708
+   }
+  },
+  "agent_guardrail": {
+   "destructive": {
+    "type": "noul",
+    "noul": 0.9696
+   },
+   "matches_request": {
+    "type": "noul",
+    "noul": 0.8965
+   },
+   "external_effect": {
+    "type": "noul",
+    "noul": 0.0134
+   },
+   "risk": {
+    "type": "score",
+    "score": 1.25,
+    "probabilities": {
+     "0": 0.0407,
+     "1": 0.7042,
+     "2": 0.2161,
+     "3": 0.039
+    }
+   }
+  }
+ }
+}
