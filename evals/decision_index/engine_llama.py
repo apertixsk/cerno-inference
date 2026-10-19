@@ -1,13 +1,13 @@
-"""Decision Index engine over llama.cpp (GGUF): the deployment path. The one generated token is sampled greedily (its probabilities
-are read pre-sampling from n_probs); sampling it at temperature 1 made llama-server drop the probabilities whenever the sampled token
-was a partial UTF-8 byte (about 0.5% of requests). (phone / laptop / llama-server), used here to measure what
-4/6/8-bit quantisation costs on the public index and what it buys in latency.
+"""Decision Index engine over llama.cpp (GGUF): the deployment path (phone / laptop / llama-server), used here to measure what 4-bit
+quantisation costs on the public index and what it buys in latency. The one generated token is sampled greedily and its probabilities
+are read pre-sampling from n_probs; sampling it at temperature 1 made llama-server drop the probabilities whenever the sampled token
+was a partial UTF-8 byte (about 0.5% of requests).
 
 Protocol = decider's inference protocol: every question is scored in its own row (state + that question), the state prefix
 is shared through llama-server's prompt cache, one generated token with neutral sampling, top-n probabilities read over the
 option label tokens and renormalised (the same readout the app uses), the shipped temperature applied as
 p^(1/T). Rows are rendered by decider's own `build` and decoded to text, so the server sees the exact training layout.
-  --engine evals.decision_index.engine_llama:LlamaGGUFEngine --option model=<hf dir (tokenizer + decider_config.json)>
+  --engine evals.decision_index.engine_llama:LlamaGGUFEngine --option model=<hf dir or Hub id (tokenizer + decider_config.json)>
            --option gguf=<file.gguf> --option base_url=http://127.0.0.1:<port>"""
 import json, math, os, random, time, urllib.error, urllib.request
 from decision_index.engines.base import Unsupported

@@ -34,6 +34,8 @@ Public index = the complete 0.3 public suite (37 benchmarks, 140,178 requests) r
 is run by the maintainers on submitted models. Latency is one process, one request at a time, on the kit's 400-request
 stratified sample. Each model's temperature ships in its `decider_config.json` and the engine applies it.
 
+On-device builds (4-bit GGUF for llama.cpp, Q4_0 body with Q8_0 head, quantisation-aware trained): [`cerno-9b-GGUF`](https://huggingface.co/apertixai/cerno-9b-GGUF) (57.96 on the public index through llama.cpp), [`cerno-4b-GGUF`](https://huggingface.co/apertixai/cerno-4b-GGUF) (57.23).
+
 v1.1 (2026-10-19): new 9B and 4B weights (+0.5 and +1.0 on the public index; the 27B is unchanged); the llama.cpp path
 (`engine_llama.py`) now samples the read-out token greedily, so llama-server always returns the pre-sampling probabilities
 (temperature-1 sampling occasionally produced a partial UTF-8 byte token and lost them). The vLLM engine is unchanged.
