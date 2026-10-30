@@ -11,7 +11,7 @@ p^(1/T). Rows are rendered by decider's own `build` and decoded to text, so the 
            --option gguf=<file.gguf> --option base_url=http://127.0.0.1:<port>"""
 import json, math, os, random, time, urllib.error, urllib.request
 from decision_index.engines.base import Unsupported
-from evals.decision_index.engine import CernoEngine
+from evals.decision_index.engine import CernoEngine, refuse_block_attention
 
 
 class LlamaGGUFEngine(CernoEngine):
@@ -22,6 +22,7 @@ class LlamaGGUFEngine(CernoEngine):
         from decision_index.engines.base import Engine
         Engine.__init__(self, **options)
         if not model or not gguf: raise ValueError("LlamaGGUFEngine needs --option model=<hf dir> --option gguf=<file.gguf>")
+        refuse_block_attention(model, "llama.cpp")
         from transformers import AutoTokenizer
         self.model_path = model; self.gguf = gguf; self.base_url = base_url.rstrip("/"); self.max_state_tokens = int(max_state_tokens); self.n_probs = int(n_probs)
         self.tok = AutoTokenizer.from_pretrained(model)

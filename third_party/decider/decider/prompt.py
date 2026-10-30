@@ -110,7 +110,8 @@ def schema_suffix_ids(tok, context, n_q, max_ctx_tokens=1536):
 
 
 def build(example, tok, rng=None, max_options=NARROW, max_ctx_tokens=1536, layout="state_first"):
-    """Returns dict(ids=list[int], slots=list[int], golds=list[int], nopts=list[int], perms=list[list[int]])."""
+    """Returns dict(ids=list[int], slots=list[int], golds=list[int], nopts=list[int], perms=list[list[int]], blocks=list[int]).
+    blocks: a block id per token (0 = the context, k + 1 = question k), read by block-bidirectional checkpoints (v1.2)."""
     if layout == "schema_first":
         return build_schema_first(example, tok, rng, max_options, max_ctx_tokens)
     rng = rng or random
@@ -119,6 +120,7 @@ def build(example, tok, rng=None, max_options=NARROW, max_ctx_tokens=1536, layou
     if len(ctx_ids) > max_ctx_tokens:                       # truncate at the token level, then go back to text (Cerno)
         ctx_ids = ctx_ids[:max_ctx_tokens]; ctx_text = tok.decode(ctx_ids)
     ids = list(ctx_ids)
+    blocks = [0] * len(ids)          # block id per token (0 = context, k + 1 = question k) for block-bidirectional attention
     slots, golds, nopts, perms = [], [], [], []
     multi = len(example.qs) > 1
     for k, q in enumerate(example.qs):
@@ -137,7 +139,11 @@ def build(example, tok, rng=None, max_options=NARROW, max_ctx_tokens=1536, layou
             if k == 0 and JOINT_FIRST_PIECE:
                 # Cerno: tokenise "Context...\n\nQuestion...Answer: (" as ONE string, exactly as the on-device app
                 # does (llama.cpp tokenises the whole prompt at once), so the state->question boundary tokens match.
-                ids = tok.encode(ctx_text + "".join(lines), add_special_tokens=False); piece = []
+                joint = ctx_text + "".join(lines)
+                enc = tok(joint, add_special_tokens=False, return_offsets_mapping=True)
+                ids = list(enc["input_ids"]); piece = []
+                n_ctx = sum(1 for s0, _ in enc["offset_mapping"] if s0 < len(ctx_text))   # tokens that start inside the context
+                blocks = [0] * n_ctx + [1] * (len(ids) - n_ctx)
             else:
                 piece = tok.encode("".join(lines), add_special_tokens=False)
         else:                                   # wide: "\n(" + <label token> + ") text", built from ids so every label is one token
@@ -146,12 +152,13 @@ def build(example, tok, rng=None, max_options=NARROW, max_ctx_tokens=1536, layou
             for j, oi in enumerate(opts):
                 piece += open_ids + [lab_ids[j]] + _enc_opt(tok, q.options[oi])
             piece += tok.encode(tail, add_special_tokens=False)
-        ids.extend(piece)
+        ids.extend(piece); blocks.extend([k + 1] * len(piece))
         slots.append(len(ids) - 1)          # position of " (" token
         golds.append(opts.index(q.gold) if q.gold in opts else -1)
         nopts.append(len(opts))
         perms.append(opts)
-    return dict(ids=ids, slots=slots, golds=golds, nopts=nopts, perms=perms)
+    assert len(blocks) == len(ids)
+    return dict(ids=ids, slots=slots, golds=golds, nopts=nopts, perms=perms, blocks=blocks)
 
 def letter_ids(tok):
     ids = label_table(tok)[1]

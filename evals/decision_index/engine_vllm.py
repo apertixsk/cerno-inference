@@ -5,7 +5,7 @@ call), one generated token with top-k logprobs read over the option label tokens
   --engine evals.decision_index.engine_vllm:VllmEngine --option model=<hf dir> [--option quantization=fp8] [--option max_model_len=20480]"""
 import json, math, os, time
 from decision_index.engines.base import Unsupported
-from evals.decision_index.engine import CernoEngine
+from evals.decision_index.engine import CernoEngine, refuse_block_attention
 
 
 def stored_quantization(model, requested=None):
@@ -35,6 +35,7 @@ class VllmEngine(CernoEngine):
         from decision_index.engines.base import Engine
         Engine.__init__(self, **options)
         if not model: raise ValueError("VllmEngine needs --option model=<hf dir>")
+        refuse_block_attention(model, "vLLM")
         from vllm import LLM, SamplingParams
         from transformers import AutoTokenizer
         self.model_path = model; self.quantization = quantization or None; self.max_state_tokens = int(max_state_tokens); self.stored_quantization = stored_quantization(model, self.quantization)

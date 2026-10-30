@@ -190,5 +190,133 @@
     }
    }
   }
+ },
+ "apertixai/cerno-9b-v1.2": {
+  "support_triage": {
+   "kind": {
+    "type": "choice",
+    "choice": "other",
+    "probabilities": {
+     "incident": 0.0018,
+     "billing": 0.0054,
+     "account": 0.0239,
+     "feedback": 0.0098,
+     "spam": 0.008,
+     "other": 0.9511
+    }
+   },
+   "urgency": {
+    "type": "score",
+    "score": 1.54,
+    "probabilities": {
+     "0": 0.1198,
+     "1": 0.3085,
+     "2": 0.4828,
+     "3": 0.0889
+    }
+   },
+   "tone": {
+    "type": "score",
+    "score": 2.01,
+    "probabilities": {
+     "0": 0.0063,
+     "1": 0.0089,
+     "2": 0.9555,
+     "3": 0.0293
+    }
+   },
+   "needs_human": {
+    "type": "noul",
+    "noul": 0.4138
+   }
+  },
+  "agent_guardrail": {
+   "destructive": {
+    "type": "noul",
+    "noul": 0.9639
+   },
+   "matches_request": {
+    "type": "noul",
+    "noul": 0.9583
+   },
+   "external_effect": {
+    "type": "noul",
+    "noul": 0.0112
+   },
+   "risk": {
+    "type": "score",
+    "score": 1.18,
+    "probabilities": {
+     "0": 0.0799,
+     "1": 0.7138,
+     "2": 0.1526,
+     "3": 0.0537
+    }
+   }
+  }
+ },
+ "apertixai/cerno-4b-v1.2": {
+  "support_triage": {
+   "kind": {
+    "type": "choice",
+    "choice": "other",
+    "probabilities": {
+     "incident": 0.0042,
+     "billing": 0.0069,
+     "account": 0.0249,
+     "feedback": 0.0321,
+     "spam": 0.029,
+     "other": 0.9029
+    }
+   },
+   "urgency": {
+    "type": "score",
+    "score": 0.74,
+    "probabilities": {
+     "0": 0.5042,
+     "1": 0.3041,
+     "2": 0.1424,
+     "3": 0.0493
+    }
+   },
+   "tone": {
+    "type": "score",
+    "score": 2.0,
+    "probabilities": {
+     "0": 0.0068,
+     "1": 0.0072,
+     "2": 0.9654,
+     "3": 0.0207
+    }
+   },
+   "needs_human": {
+    "type": "noul",
+    "noul": 0.4002
+   }
+  },
+  "agent_guardrail": {
+   "destructive": {
+    "type": "noul",
+    "noul": 0.9327
+   },
+   "matches_request": {
+    "type": "noul",
+    "noul": 0.9025
+   },
+   "external_effect": {
+    "type": "noul",
+    "noul": 0.0181
+   },
+   "risk": {
+    "type": "score",
+    "score": 1.35,
+    "probabilities": {
+     "0": 0.1978,
+     "1": 0.4015,
+     "2": 0.2547,
+     "3": 0.146
+    }
+   }
+  }
  }
 }

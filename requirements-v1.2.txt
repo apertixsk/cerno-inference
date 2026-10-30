@@ -1,0 +1,10 @@
+# Cerno v1.2 (cerno-9b-v1.2, cerno-4b-v1.2): block-bidirectional attention, applied through transformers' block mask, so these
+# two models run on the transformers engine in bf16 (evals.decision_index.engine:CernoEngine). vLLM cannot apply the mask; the
+# v1.0 / v1.1 models keep requirements.txt and the vLLM engine. Tested with exactly these versions (torch 2.14.1, CUDA 13.0, H200).
+torch==2.14.1                      # the version our runs used; PyPI installs its CUDA 13.0 build
+transformers==5.17.0              # create_causal_mask(block_sequence_ids=...)
+flash-linear-attention==0.5.2     # the Qwen3.5 linear-attention kernels transformers uses when installed (our runs used them)
+huggingface_hub>=0.34
+datasets>=3.0
+pyyaml>=6
+decision-index @ git+https://github.com/apolinario/decision-index@9eb2dbe2a358004c8782c66e40a83ac07b953fec

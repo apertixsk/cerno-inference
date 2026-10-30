@@ -67,13 +67,15 @@ class Decider:
         if temperature is None:
             temperature = float(cfg.get("temperature", 1.0))
         self.neutralize_none = bool(cfg.get("neutralize_none", True))   # v4 and earlier learned the literal string as an abstain signal
+        self.attention = str(cfg.get("attention", "causal"))           # v1.2: block-bidirectional checkpoints say so in decider_config.json
+        self.read_twice_tokens = int(cfg.get("read_twice_tokens", 0))  # v1.2: read requests of at most this many tokens twice (0 = off)
         if use_graphs is None:
-            use_graphs = str(device).startswith("cuda")
+            use_graphs = str(device).startswith("cuda") and self.attention == "causal"   # the CUDA-graph engine has no block masks
         if use_graphs:
             from decider.engine import Engine
             self.eng = Engine(path, device=device, dtype=dtype); self.m = self.eng.m
         else:
-            self.eng = None; self.m = DecisionModel(path, dtype=dtype, grad_ckpt=False).to(device).eval()
+            self.eng = None; self.m = DecisionModel(path, dtype=dtype, grad_ckpt=False, attention=self.attention).to(device).eval()
         self.dev = device; self.T = temperature; self.abstain_below = abstain_below
         self.name = "decider-" + str(cfg.get("version", "dev"))
         self.schema_first = bool(cfg.get("schema_first", False)) and self.eng is not None      # default layout. Questions-first (the cacheable one) costs accuracy
@@ -100,7 +102,8 @@ class Decider:
         else:
             b = collate(items, self.m.tok.pad_token_id)
             logits = self.m.slot_logits(b["input_ids"].to(self.dev), b["attention_mask"].to(self.dev), b["slot_idx"].to(self.dev),
-                                        b["slot_batch"].to(self.dev), b["nopts"].to(self.dev))
+                                        b["slot_batch"].to(self.dev), b["nopts"].to(self.dev),
+                                        block_ids=b["block_ids"].to(self.dev) if b.get("block_ids") is not None else None)
             probs = torch.softmax(logits / self.T, -1).cpu()
         out, k = [], 0
         for context, qs in requests:
@@ -167,7 +170,8 @@ class Decider:
                         probs += self.eng.score_items(items[i:i + per], temperature=self.T)
                     else:
                         bt = collate(items[i:i + per], self.m.tok.pad_token_id)
-                        lg = self.m.slot_logits(*[bt[k].to(self.dev) for k in ("input_ids", "attention_mask", "slot_idx", "slot_batch", "nopts")])
+                        lg = self.m.slot_logits(*[bt[k].to(self.dev) for k in ("input_ids", "attention_mask", "slot_idx", "slot_batch", "nopts")],
+                                                block_ids=bt["block_ids"].to(self.dev) if bt.get("block_ids") is not None else None)
                         pr = torch.softmax(lg / self.T, -1).cpu(); c = 0
                         for it in items[i:i + per]:
                             probs.append(pr[c:c + len(it["slots"])]); c += len(it["slots"])

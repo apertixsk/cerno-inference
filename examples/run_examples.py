@@ -1,11 +1,12 @@
 """Answer the example requests with a Cerno model and print the answers next to the published ones.
-  python examples/run_examples.py apertixai/cerno-9b        (PYTHONPATH=<repo>:<repo>/third_party/decider, one GPU)"""
+  python examples/run_examples.py apertixai/cerno-9b        (PYTHONPATH=<repo>:<repo>/third_party/decider, one GPU)
+The engine follows the checkpoint: transformers for the block-attention v1.2 models, vLLM for the others."""
 import json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path[:0] = [os.path.dirname(HERE), os.path.join(os.path.dirname(HERE), "third_party", "decider")]
-from evals.decision_index.engine_vllm import VllmEngine
+from evals.decision_index.engine import engine_for
 model = sys.argv[1] if len(sys.argv) > 1 else "apertixai/cerno-27b"
 requests = json.load(open(os.path.join(HERE, "requests.json"))); published = json.load(open(os.path.join(HERE, "answers.json"))).get(model, {})
-engine = VllmEngine(model=model)
+engine = engine_for(model)(model=model)
 for r in requests:
     response, _ = engine(r["state"], r["questions"]); print(f"\n== {r['name']}: {json.dumps(r['state'])[:100]}")
     for qid, a in response["answers"].items():
