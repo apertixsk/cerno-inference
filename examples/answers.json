@@ -318,5 +318,102 @@
     }
    }
   }
+ },
+ "apertixai/cerno-27b-v1.1": {
+  "support_triage": {
+   "kind": {
+    "type": "choice",
+    "choice": "other",
+    "probabilities": {
+     "incident": 0.0043,
+     "billing": 0.0051,
+     "account": 0.0337,
+     "feedback": 0.0337,
+     "spam": 0.0054,
+     "other": 0.9179
+    }
+   },
+   "urgency": {
+    "type": "score",
+    "score": 1.15,
+    "probabilities": {
+     "0": 0.1441,
+     "1": 0.5939,
+     "2": 0.231,
+     "3": 0.0311
+    }
+   },
+   "tone": {
+    "type": "score",
+    "score": 2.06,
+    "probabilities": {
+     "0": 0.002,
+     "1": 0.0058,
+     "2": 0.9234,
+     "3": 0.0688
+    }
+   },
+   "needs_human": {
+    "type": "noul",
+    "noul": 0.4124
+   }
+  },
+  "agent_guardrail": {
+   "destructive": {
+    "type": "noul",
+    "noul": 0.9801
+   },
+   "matches_request": {
+    "type": "noul",
+    "noul": 0.9379
+   },
+   "external_effect": {
+    "type": "noul",
+    "noul": 0.0059
+   },
+   "risk": {
+    "type": "score",
+    "score": 1.28,
+    "probabilities": {
+     "0": 0.0545,
+     "1": 0.6498,
+     "2": 0.2527,
+     "3": 0.043
+    }
+   }
+  },
+  "device_context": {
+   "interrupt_now": {
+    "type": "noul",
+    "noul": 0.0621
+   },
+   "topic": {
+    "type": "choice",
+    "choice": "commerce",
+    "probabilities": {
+     "family": 0.0006,
+     "safety": 0.0073,
+     "travel": 0.0054,
+     "work": 0.0024,
+     "commerce": 0.9735,
+     "marketing": 0.0048,
+     "other": 0.0061
+    }
+   },
+   "importance": {
+    "type": "score",
+    "score": 1.15,
+    "probabilities": {
+     "0": 0.1025,
+     "1": 0.6773,
+     "2": 0.1849,
+     "3": 0.0354
+    }
+   },
+   "read_aloud": {
+    "type": "noul",
+    "noul": 0.2569
+   }
+  }
  }
 }

@@ -31,7 +31,7 @@ class VllmEngine(CernoEngine):
     name = "cerno_vllm"
     latency = "In-process request wall time: the request's question rows batched into one vLLM generate call (prefix-cached state), one token each, top-k label logprobs; excludes model loading."
 
-    def __init__(self, model=None, quantization=None, temperature=None, max_state_tokens=16384, max_model_len=20480, gpu_memory_utilization=0.9, **options):
+    def __init__(self, model=None, quantization=None, temperature=None, max_state_tokens=16384, max_model_len=20480, gpu_memory_utilization=0.9, read_twice_tokens=None, **options):
         from decision_index.engines.base import Engine
         Engine.__init__(self, **options)
         if not model: raise ValueError("VllmEngine needs --option model=<hf dir>")
@@ -49,6 +49,8 @@ class VllmEngine(CernoEngine):
         except Exception: pass
         self.temperature = float(temperature) if temperature is not None else float(cfg.get("temperature", 1.0))
         self.neutralize_none = bool(cfg.get("neutralize_none", True))
+        # read twice (27B v1.1): option, else decider_config.json, else off; v1.0 / v1.1 checkpoints declare none, so they read once as before
+        self.read_twice_tokens = int(read_twice_tokens) if read_twice_tokens is not None else int(cfg.get("read_twice_tokens", 0))
         t = time.time()
         self.llm = LLM(model=model, quantization=self.quantization, dtype="bfloat16", max_model_len=int(max_model_len), max_logprobs=300, gpu_memory_utilization=float(gpu_memory_utilization), enable_prefix_caching=True, trust_remote_code=True)
         self.tok = AutoTokenizer.from_pretrained(model)
@@ -58,7 +60,24 @@ class VllmEngine(CernoEngine):
         self.tag = os.path.basename(os.path.dirname(model.rstrip("/"))) if model.rstrip("/").endswith("/model") else os.path.basename(model.rstrip("/"))
         self.provenance = {"kind": "local-weights-vllm", "temperature": self.temperature, "quantization": self.stored_quantization, "loaded_seconds": round(time.time() - t),
                            "policy": "one row per question, rows of a request batched in one generate call with prefix caching, one token, top-k label logprobs renormalised, temperature as p^(1/T)"}
+        if self.read_twice_tokens:
+            self.provenance["read_twice_tokens"] = self.read_twice_tokens
+            self.provenance["policy"] += f"; requests of at most {self.read_twice_tokens} tokens are read twice (read once when the doubled prompt exceeds the served context)"
         import types; self.torch = types.SimpleNamespace(cuda=types.SimpleNamespace(is_available=lambda: False), OutOfMemoryError=MemoryError); self.splits = 0   # the base class checks torch.cuda after each request
+
+    def __call__(self, state, questions):
+        """CernoEngine's request path (read twice included); a read-twice prompt the served context cannot hold is read once."""
+        try:
+            return super().__call__(state, questions)
+        except Unsupported as e:
+            if not self.read_twice_tokens or "exceeds the served context" not in str(e): raise
+        rt = self.read_twice_tokens; self.read_twice_tokens = 0
+        try:
+            out = super().__call__(state, questions)
+        finally:
+            self.read_twice_tokens = rt
+        self.read_twice_n = getattr(self, "read_twice_n", 1) - 1; self.read_twice_fallback = getattr(self, "read_twice_fallback", 0) + 1
+        return out
 
     def _tok(self): return self.tok
 

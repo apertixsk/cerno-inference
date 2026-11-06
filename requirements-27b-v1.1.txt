@@ -1,0 +1,8 @@
+# Cerno 27B v1.1 (cerno-27b-v1.1): causal attention, FP8 weights, served on vLLM with read twice (requests of up to 3,000 tokens).
+# Tested with exactly these versions (H200, CUDA 13.0); vLLM 0.31.0 pins torch 2.13.0 and needs transformers 5.10.4-5.17.
+vllm==0.31.0
+transformers==5.17.0
+huggingface_hub>=0.34
+datasets>=3.0
+pyyaml>=6
+decision-index @ git+https://github.com/apolinario/decision-index@9eb2dbe2a358004c8782c66e40a83ac07b953fec
